@@ -1,0 +1,33 @@
+version: '3.8'
+
+networks:
+  mynetwork:
+
+services:
+  db:
+    image: postgres
+    container_name: my-postgres123
+    restart: always
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: "lee1"
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: todolist
+    networks:
+      - mynetwork
+
+  backend:
+    build: ../../Downloads/Eureka/demo/TodoApi-main
+    container_name: goodnight
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db  # healthcheck 의존성 제거
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/todolist
+      SPRING_DATASOURCE_USERNAME: lee1
+      SPRING_DATASOURCE_PASSWORD: 1234
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    networks:
+      - mynetwork
