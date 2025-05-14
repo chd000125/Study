@@ -40,20 +40,10 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
         String token = authHeader.substring(7);
 
         try {
-            Claims claims = Jwts.parserBuilder()
+            Jwts.parserBuilder()
                     .setSigningKey(getSigningKey())
                     .build()
-                    .parseClaimsJws(token)
-                    .getBody();
-
-            String email = claims.getSubject(); // 이메일 or 유저 ID
-            String role = claims.get("role", String.class);
-
-            // 필요 시 헤더에 유저 정보 추가하여 서비스로 전달
-            exchange.getRequest().mutate()
-                    .header("X-User-Email", email)
-                    .header("X-User-Role", role)
-                    .build();
+                    .parseClaimsJws(token); // 검증만 수행
 
             return chain.filter(exchange);
 
@@ -62,6 +52,7 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
             return exchange.getResponse().setComplete();
         }
     }
+
 
     @Override
     public int getOrder() {
